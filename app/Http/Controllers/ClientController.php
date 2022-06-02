@@ -101,10 +101,21 @@ class ClientController extends Controller
 
         return response()->json($model);
     }
-    public function delete(){
+    public function delete($id){
         if(checkRole()!=Roles::SYS_OWNER &&checkRole()!=Roles::COMPANY_OWNER){
             return permissionError();
         }
+        $model= Client::query()->find($id);
+
+        if (!$model) {
+            return notFoundError($id);
+        }
+        $delete=checkIfExist('Project','client_id',$id);
+        if($delete==1){
+            return notDeleteError();
+        }
+        Client::where('id', '=', $id)->delete();
+        return deleted();
 
     }
     //

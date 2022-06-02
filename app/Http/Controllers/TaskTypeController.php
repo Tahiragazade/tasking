@@ -101,10 +101,22 @@ class TaskTypeController extends Controller
 
         return response()->json($model);
     }
-    public function delete(){
+    public function delete($id){
         if(checkRole()==Roles::WORKER){
             return permissionError();
         }
+        $model= TaskType::query()->find($id);
+
+        if (!$model) {
+            return notFoundError($id);
+        }
+        $delete=checkIfExist('Task','task_type',$id);
+        if($delete==1){
+            return notDeleteError();
+        }
+        TaskType::where('id', '=', $id)->delete();
+
+        return deleted();
 
     }
     //

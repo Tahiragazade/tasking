@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\ProjectManager;
+use App\Models\SubTask;
 use App\Models\Task;
 use App\Models\Workers;
 use Illuminate\Http\JsonResponse;
@@ -141,10 +142,23 @@ class TaskController extends Controller
 
         return response()->json($model);
     }
-    public function delete(){
+    public function delete($id){
         if(checkRole()==Roles::WORKER ){
             return permissionError();
         }
+        $model= Task::query()->find($id);
+
+        if (!$model) {
+            return notFoundError($id);
+        }
+        $delete=checkIfExist('SubTask','task_id',$id);
+        $delete_2=checkIfExist('CheckList','sub_task_id',$id);
+        if($delete==1 || $delete_2==1){
+            return notDeleteError();
+        }
+        Task::where('id', '=', $id)->delete();
+
+        return deleted();
 
     }
     public function statusTree(){

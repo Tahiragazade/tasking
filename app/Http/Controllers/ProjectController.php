@@ -129,10 +129,23 @@ class ProjectController extends Controller
 
         return response()->json($model);
     }
-    public function delete(){
+    public function delete($id){
         if(checkRole()!=Roles::SYS_OWNER &&checkRole()!=Roles::COMPANY_OWNER){
             return permissionError();
         }
+
+        $model= Project::query()->find($id);
+
+        if (!$model) {
+            return notFoundError($id);
+        }
+        $delete=checkIfExist('Task','project_id',$id);
+        if($delete==1){
+            return notDeleteError();
+        }
+        Project::where('id', '=', $id)->delete();
+
+        return deleted();
 
     }
     public function addWorker(Request $request): JsonResponse

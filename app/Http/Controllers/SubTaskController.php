@@ -114,10 +114,22 @@ class SubTaskController extends Controller
 
         return response()->json($model);
     }
-    public function delete(){
+    public function delete($id){
         if(checkRole()==Roles::WORKER ){
             return permissionError();
         }
+        $model= SubTask::query()->find($id);
+
+        if (!$model) {
+            return notFoundError($id);
+        }
+        $delete=checkIfExist('CheckList','sub_task_id',$id);
+        if($delete==1){
+            return notDeleteError();
+        }
+        SubTask::where('id', '=', $id)->delete();
+
+        return deleted();
 
     }
 
