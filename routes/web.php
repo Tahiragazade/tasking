@@ -81,4 +81,11 @@ Route::group([
     Route::get('checklist/all', 'CheckListController@all');
     Route::get('checklist/tree', 'CheckListController@tree');
 
+    Route::post('issues/store', 'IssuesController@store');
+    Route::put('issues/update/{id}', 'IssuesController@update');
+    Route::get('issues/single/{id}', 'IssuesController@single');
+    Route::get('issues/delete/{id}', 'IssuesController@delete');
+    Route::get('issues/all', 'IssuesController@all');
+    Route::get('issues/tree', 'IssuesController@tree');
+
 });
