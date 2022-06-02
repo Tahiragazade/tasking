@@ -10,6 +10,16 @@ class Roles {
     const PROJECT_MANAGER = 3;
     const WORKER = 3;
 }
+class TaskStatus{
+    const TASK_WAITING =0;
+    const TASK_STARTED =1;
+    const WAITING_FOR_TECHNICAL_TASK =2;
+    const WAITING_FOR_RESOURCE =3;
+    const TASK_TESTING =4;
+    const TASK_HAND_OVER =5;
+    const PROJECT_HAND_OVER =6;
+    const TASK_CANCELLED =7;
+}
 function validationError($errors){
 
     return response()->json([
@@ -92,6 +102,64 @@ function simpleTree($datas){
             'title' => $data->name,
         );
     }
+    return $tree;
+}
+function taskTree($datas){
+    $tree = [];
+    foreach ($datas as $data) {
+        $tree[] = array(
+            'key' => $data->id,
+            'value' => $data->id,
+            'title' => $data->task,
+        );
+    }
+    return $tree;
+}
+function statusTree(){
+    $tree = [];
+
+        $tree[] = array(
+            'key' => 0,
+            'value' => 0,
+            'title' => 'Gözləmədə',
+        );
+        $tree[] = array(
+            'key' => 1,
+            'value' => 1,
+            'title' => 'Başlayıb',
+        );
+        $tree[] = array(
+            'key' => 2,
+            'value' => 2,
+            'title' => 'Texniki Tapşırıq Gözlənilir',
+        );
+        $tree[] = array(
+            'key' => 3,
+            'value' => 3,
+            'title' => 'Resurs Gözlənilir',
+        );
+        $tree[] = array(
+            'key' => 4,
+            'value' => 4,
+            'title' => 'Test Mərhələsindədir',
+        );
+        $tree[] = array(
+            'key' => 5,
+            'value' => 5,
+            'title' => 'Tapşırıq Təhvil Verilib',
+        );
+        $tree[] = array(
+            'key' => 6,
+            'value' => 6,
+            'title' => 'Proyekt Təhvil Verilib',
+        );
+        $tree[] = array(
+            'key' => 7,
+            'value' => 7,
+            'title' => 'Tapşırıq Ləğv Edilib',
+        );
+
+
     return $tree;
 }
 
