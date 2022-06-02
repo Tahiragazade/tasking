@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\CheckList;
 use App\Models\Project;
 use App\Models\ProjectManager;
 use App\Models\SubTask;
@@ -17,7 +18,7 @@ use Illuminate\Validation\Rule;
 use Roles;
 use TaskStatus;
 
-class SubTaskController extends Controller
+class CheckListController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -31,23 +32,24 @@ class SubTaskController extends Controller
     public function all(Request $request): JsonResponse
     {
         paginate($request, $limit, $offset);
-        $subTaskQuery = SubTask::query();
+        $checkListQuery = CheckList::query();
 
 //        if($request->has('name')) {
-//            $subTaskQuery->where('name', 'like', filter($request->get('name')));
+//            $checkListQuery->where('name', 'like', filter($request->get('name')));
 //        }
 
-        $count = $subTaskQuery->count();
-        $sub_tasks = $subTaskQuery->limit($request->get('limit'))->offset($request->get('offset'))->get();
+        $count = $checkListQuery->count();
+        $check_lists = $checkListQuery->limit($request->get('limit'))->offset($request->get('offset'))->get();
 
 
-        return response()->json(['data' => $sub_tasks, 'total' => $count]);
+        return response()->json(['data' => $check_lists, 'total' => $count]);
     }
     public function store(Request $request){
 
         $validator = Validator::make($request->all(), [
             'name'=>['required','string'],
-            'task_id'=>['required','integer'],
+            'sub_task_id'=>['required','integer'],
+            'type'=>['required','integer'],
             'note'=>['string'],
 
         ]);
@@ -55,10 +57,11 @@ class SubTaskController extends Controller
         {
             return validationError($validator->errors());
         }
-        $model= new SubTask();
+        $model= new CheckList();
         $model->name=$request->name;
-        $model->task_id=$request->task_id;
+        $model->sub_task_id=$request->sub_task_id;
         $model->note=$request->note;
+        $model->type=$request->type;
         $model->status=TaskStatus::TASK_WAITING;
         $model->created_by=Auth::id();
 
@@ -71,7 +74,8 @@ class SubTaskController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name'=>['required','string'],
-            'task_id'=>['required','integer'],
+            'sub_task_id'=>['required','integer'],
+            'type'=>['required','integer'],
             'note'=>['string'],
 
         ]);
@@ -80,10 +84,11 @@ class SubTaskController extends Controller
         {
             return validationError($validator->errors());
         }
-        $model=SubTask::find($request->id);
+        $model=CheckList::find($request->id);
         $model->name=$request->name;
-        $model->task_id=$request->task_id;
+        $model->sub_task_id=$request->sub_task_id;
         $model->note=$request->note;
+        $model->type=$request->type;
         $model->status=TaskStatus::TASK_WAITING;
 
         $model->save();
@@ -93,20 +98,20 @@ class SubTaskController extends Controller
     public function tree(Request $request): JsonResponse
     {
         paginate($request, $limit, $offset);
-        $subTaskQuery = SubTask::query();
+        $checkListQuery = CheckList::query();
 
 //        if($request->has('name')) {
-//            $subTaskQuery->where('name', 'like', filter($request->get('name')));
+//            $checkListQuery->where('name', 'like', filter($request->get('name')));
 //        }
 
-        $count = $subTaskQuery->count();
-        $sub_tasks = $subTaskQuery->limit($request->get('limit'))->offset($request->get('offset'))->get();
+        $count = $checkListQuery->count();
+        $check_lists = $checkListQuery->limit($request->get('limit'))->offset($request->get('offset'))->get();
 
-        $data = simpleTree($sub_tasks);
+        $data = simpleTree($check_lists);
         return response()->json(['data' => $data, 'total' => $count]);
     }
     public function single($id){
-        $model= SubTask::query()->find($id);
+        $model= CheckList::query()->find($id);
 
         if (!$model) {
             return notFoundError($id);

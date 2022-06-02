@@ -67,4 +67,18 @@ Route::group([
     Route::get('tasks/tree', 'TaskController@tree');
     Route::get('tasks/statuses', 'TaskController@statusTree');
 
+    Route::post('sub-tasks/store', 'SubTaskController@store');
+    Route::put('sub-tasks/update/{id}', 'SubTaskController@update');
+    Route::get('sub-tasks/single/{id}', 'SubTaskController@single');
+    Route::get('sub-tasks/delete/{id}', 'SubTaskController@delete');
+    Route::get('sub-tasks/all', 'SubTaskController@all');
+    Route::get('sub-tasks/tree', 'SubTaskController@tree');
+
+    Route::post('checklist/store', 'CheckListController@store');
+    Route::put('checklist/update/{id}', 'CheckListController@update');
+    Route::get('checklist/single/{id}', 'CheckListController@single');
+    Route::get('checklist/delete/{id}', 'CheckListController@delete');
+    Route::get('checklist/all', 'CheckListController@all');
+    Route::get('checklist/tree', 'CheckListController@tree');
+
 });

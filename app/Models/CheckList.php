@@ -11,18 +11,19 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 //this is new
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class SubTask extends Model
+class CheckList extends Model
 {
 
-    protected $table = 'sub_tasks';
+    protected $table = 'check_lists';
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
      * @return mixed
      */
     protected $fillable = [
-        'task_id',
+        'sub_task_id',
         'name',
+        'type',
         'note',
 
     ];

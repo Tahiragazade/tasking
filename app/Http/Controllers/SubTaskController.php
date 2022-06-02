@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\ProjectManager;
+use App\Models\SubTask;
 use App\Models\Task;
 use App\Models\Workers;
 use Illuminate\Http\JsonResponse;
@@ -16,7 +17,7 @@ use Illuminate\Validation\Rule;
 use Roles;
 use TaskStatus;
 
-class TaskController extends Controller
+class SubTaskController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -30,31 +31,23 @@ class TaskController extends Controller
     public function all(Request $request): JsonResponse
     {
         paginate($request, $limit, $offset);
-        $taskQuery = Task::query();
+        $subTaskQuery = SubTask::query();
 
 //        if($request->has('name')) {
-//            $taskQuery->where('name', 'like', filter($request->get('name')));
+//            $subTaskQuery->where('name', 'like', filter($request->get('name')));
 //        }
 
-        $count = $taskQuery->count();
-        $tasks = $taskQuery->limit($request->get('limit'))->offset($request->get('offset'))->get();
+        $count = $subTaskQuery->count();
+        $sub_tasks = $subTaskQuery->limit($request->get('limit'))->offset($request->get('offset'))->get();
 
 
-        return response()->json(['data' => $tasks, 'total' => $count]);
+        return response()->json(['data' => $sub_tasks, 'total' => $count]);
     }
     public function store(Request $request){
-        if(checkRole()==Roles::WORKER){
-            return permissionError();
-        }
+
         $validator = Validator::make($request->all(), [
-            'worker_id'=>['required','integer'],
-            'task'=>['required','string'],
-            'task_type'=>['required','integer'],
-            'project_id'=>['required','integer'],
-            'given_date'=>['required','date'],
-            'start_date'=>['date'],
-            'end_date'=>['date'],
-            'scheduled_day'=>['required','integer'],
+            'name'=>['required','string'],
+            'task_id'=>['required','integer'],
             'note'=>['string'],
 
         ]);
@@ -62,16 +55,11 @@ class TaskController extends Controller
         {
             return validationError($validator->errors());
         }
-        $model= new Task();
-        $model->worker_id=$request->worker_id;
-        $model->task=$request->task;
-        $model->task_type=$request->task_type;
+        $model= new SubTask();
+        $model->name=$request->name;
+        $model->task_id=$request->task_id;
         $model->note=$request->note;
-        $model->project_id=$request->project_id;
-        $model->given_date=$request->given_date;
-        $model->end_date=$request->end_date;
-        $model->scheduled_day=$request->scheduled_day;
-        $model->task_status=TaskStatus::TASK_WAITING;
+        $model->status=TaskStatus::TASK_WAITING;
         $model->created_by=Auth::id();
 
         $model->save();
@@ -81,18 +69,9 @@ class TaskController extends Controller
     }
     public function update(Request $request)
     {
-        if(checkRole()==Roles::WORKER){
-            return permissionError();
-        }
         $validator = Validator::make($request->all(), [
-            'worker_id'=>['required','integer'],
-            'task'=>['required','string'],
-            'task_type'=>['required','integer'],
-            'project_id'=>['required','integer'],
-            'given_date'=>['required','date'],
-            'start_date'=>['date'],
-            'end_date'=>['date'],
-            'scheduled_day'=>['required','integer'],
+            'name'=>['required','string'],
+            'task_id'=>['required','integer'],
             'note'=>['string'],
 
         ]);
@@ -101,17 +80,11 @@ class TaskController extends Controller
         {
             return validationError($validator->errors());
         }
-        $model=Task::find($request->id);
-        $model->worker_id=$request->worker_id;
-        $model->task=$request->task;
-        $model->task_type=$request->task_type;
+        $model=SubTask::find($request->id);
+        $model->name=$request->name;
+        $model->task_id=$request->task_id;
         $model->note=$request->note;
-        $model->project_id=$request->project_id;
-        $model->given_date=$request->given_date;
-        $model->end_date=$request->end_date;
-        $model->scheduled_day=$request->scheduled_day;
-        $model->task_status=TaskStatus::TASK_WAITING;
-        $model->created_by=Auth::id();
+        $model->status=TaskStatus::TASK_WAITING;
 
         $model->save();
 
@@ -120,20 +93,20 @@ class TaskController extends Controller
     public function tree(Request $request): JsonResponse
     {
         paginate($request, $limit, $offset);
-        $taskQuery = Task::query();
+        $subTaskQuery = SubTask::query();
 
 //        if($request->has('name')) {
-//            $taskQuery->where('name', 'like', filter($request->get('name')));
+//            $subTaskQuery->where('name', 'like', filter($request->get('name')));
 //        }
 
-        $count = $taskQuery->count();
-        $tasks = $taskQuery->limit($request->get('limit'))->offset($request->get('offset'))->get();
+        $count = $subTaskQuery->count();
+        $sub_tasks = $subTaskQuery->limit($request->get('limit'))->offset($request->get('offset'))->get();
 
-        $data = taskTree($tasks);
+        $data = simpleTree($sub_tasks);
         return response()->json(['data' => $data, 'total' => $count]);
     }
     public function single($id){
-        $model= Task::query()->find($id);
+        $model= SubTask::query()->find($id);
 
         if (!$model) {
             return notFoundError($id);
@@ -147,10 +120,6 @@ class TaskController extends Controller
         }
 
     }
-    public function statusTree(){
-        $data = statusTree();
-        $count=count($data);
-        return response()->json(['data' => $data, 'total' => $count]);
-    }
+
 
 }
