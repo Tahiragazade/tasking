@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\CheckList;
+use App\Models\Issues;
 use App\Models\Project;
 use App\Models\ProjectManager;
 use App\Models\SubTask;
@@ -246,8 +248,26 @@ class ProjectController extends Controller
             ->get();
 
         foreach ($query as $data) {
-            $data->subtask =SubTask::where(['task_id' => $data->task_id])->get();
+            $data->issues =Issues::where(['sub_task_id' => $data->task_id])->where(['type'=>0])->get();
+            $data->checkBox =SubTask::where(['task_id' => $data->task_id])->get();
 
+
+        }
+        foreach ($query as $datas){
+
+            foreach ($datas->checkBox as $data){
+                $data->issues =Issues::where(['sub_task_id' => $data->id])->where(['type'=>1])->get();
+                $data->checkList =CheckList::where(['sub_task_id' => $data->id])->get();
+
+            }
+        }
+        foreach ($query as $datas){
+
+            foreach ($datas->checkBox as $data){
+                foreach ($data->checkList as $item){
+                    $item->issues =Issues::where(['sub_task_id' => $data->id])->where(['type'=>2])->get();
+                }
+            }
         }
 
         $count=count($query);

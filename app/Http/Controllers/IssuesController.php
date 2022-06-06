@@ -51,6 +51,7 @@ class IssuesController extends Controller
             'name'=>['required','string'],
             'sub_task_id'=>['required','integer'],
             'type'=>['required','integer'],
+            'priority'=>['required','integer'],
             'note'=>['string'],
 
         ]);
@@ -63,6 +64,7 @@ class IssuesController extends Controller
         $model->sub_task_id=$request->sub_task_id;
         $model->note=$request->note;
         $model->type=$request->type;
+        $model->priority=$request->priority;
         $model->status=TaskStatus::TASK_WAITING;
         $model->created_by=Auth::id();
 
@@ -77,6 +79,7 @@ class IssuesController extends Controller
             'name'=>['required','string'],
             'sub_task_id'=>['required','integer'],
             'type'=>['required','integer'],
+            'priority'=>['required','integer'],
             'note'=>['string'],
 
         ]);
@@ -89,6 +92,7 @@ class IssuesController extends Controller
         $model->name=$request->name;
         $model->sub_task_id=$request->sub_task_id;
         $model->note=$request->note;
+        $model->priority=$request->priority;
         $model->type=$request->type;
         $model->status=TaskStatus::TASK_WAITING;
 
@@ -117,7 +121,6 @@ class IssuesController extends Controller
         if (!$model) {
             return notFoundError($id);
         }
-
         return response()->json($model);
     }
     public function delete(){

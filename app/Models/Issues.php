@@ -25,6 +25,7 @@ class Issues extends Model
         'name',
         'type',
         'note',
+        'priority',
 
     ];
 
