@@ -58,6 +58,8 @@ Route::group([
     Route::get('projects/all', 'ProjectController@all');
     Route::get('projects/tree', 'ProjectController@tree');
     Route::post('projects/add-worker', 'ProjectController@addWorker');
+    Route::get('projects/my-projects', 'ProjectController@myProjects');
+    Route::get('projects/details/{id}', 'ProjectController@projectDetails');
 
     Route::post('tasks/store', 'TaskController@store');
     Route::put('tasks/update/{id}', 'TaskController@update');
@@ -66,6 +68,7 @@ Route::group([
     Route::get('tasks/all', 'TaskController@all');
     Route::get('tasks/tree', 'TaskController@tree');
     Route::get('tasks/statuses', 'TaskController@statusTree');
+    Route::get('tasks/my-tasks', 'TaskController@myTasks');
 
     Route::post('sub-tasks/store', 'SubTaskController@store');
     Route::put('sub-tasks/update/{id}', 'SubTaskController@update');

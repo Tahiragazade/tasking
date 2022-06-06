@@ -166,5 +166,16 @@ class TaskController extends Controller
         $count=count($data);
         return response()->json(['data' => $data, 'total' => $count]);
     }
+    public function myTasks(){
+        $user=auth()->user();
+        if($user->role!=Roles::WORKER){
+            return permissionError();
+        }
+
+        $data=Task::where(['worker_id'=>$user->id])->get();
+        $count= count($data);
+        return response()->json(['data' => $data, 'total' => $count]);
+
+    }
 
 }

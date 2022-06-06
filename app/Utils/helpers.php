@@ -8,7 +8,7 @@ class Roles {
     const COMPANY_OWNER = 1;
     const TEAM_LEADER = 2;
     const PROJECT_MANAGER = 3;
-    const WORKER = 3;
+    const WORKER = 4;
 }
 class TaskStatus{
     const TASK_WAITING =0;

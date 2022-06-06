@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\ProjectManager;
+use App\Models\SubTask;
+use App\Models\Task;
 use App\Models\Workers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -179,4 +181,79 @@ class ProjectController extends Controller
 
         return response()->json(['data' => $workers]);
     }
+    public function myProjects(){
+        $user=auth()->user();
+        if($user->role==Roles::PROJECT_MANAGER){
+            $project_list=ProjectManager::select('project_id')->where(['user_id'=>$user->id])->get();
+            $lists=array();
+            foreach ($project_list as $list){
+                array_push($lists,$list->project_id);
+            }
+            $projects=Project::wherein('id',$lists)->get();
+            $count=count($projects);
+            $data = simpleTree($projects);
+            return response()->json(['data' => $data, 'total' => $count]);
+        }
+        if($user->role==Roles::TEAM_LEADER){
+
+            $projects=Project::where('departament_id',$user->department_id)->get();
+            $count=count($projects);
+            $data = simpleTree($projects);
+            return response()->json(['data' => $data, 'total' => $count]);
+        }
+        if($user->role==Roles::WORKER){
+            $project_list=Workers::select('project_id')->where(['user_id'=>$user->id])->get();
+            $lists=array();
+            foreach ($project_list as $list){
+                array_push($lists,$list->project_id);
+            }
+            $projects=Project::wherein('id',$lists)->get();
+            $count=count($projects);
+            $data = simpleTree($projects);
+            return response()->json(['data' => $data, 'total' => $count]);
+        }
+        $projects=Project::all();
+        $count=count($projects);
+        $data = simpleTree($projects);
+        return response()->json(['data' => $data, 'total' => $count]);
+    }
+
+    public function projectDetails($id){
+        $query=Task::query()
+            ->SELECT ([
+                'tasks.id as task_id',
+                DB::raw('CONCAT(tl.firstName," ", tl.lastName) AS "team_leader"'),
+                DB::raw('CONCAT(w.firstName, " ", w.lastName) as "worker"'),
+                DB::raw('tasks.task AS "task"'),
+                DB::raw('t.name AS "task_type"'),
+                DB::raw('c.name AS "client_name"'),
+                DB::raw('p.name AS "project_name"'),
+                'tasks.given_date',
+                'tasks.start_date',
+                'tasks.end_date',
+                'tasks.scheduled_day',
+                'tasks.note',
+            ])
+            ->LeftJoin('projects as p','tasks.project_id','=','p.id')
+            ->LeftJoin('departaments as d','p.departament_id','=','d.id')
+            ->LeftJoin('users as tl', function ($join){
+                $join->on('d.id','=','tl.department_id')
+                    ->where('tl.role','=',2);
+            })
+            ->LeftJoin('users as w','tasks.worker_id','=','w.id')
+            ->LeftJoin('task_types as t','tasks.task_type','=','t.id')
+            ->LeftJoin('clients as c','p.client_id','=','c.id')
+            ->get();
+
+        foreach ($query as $data) {
+            $data->subtask =SubTask::where(['task_id' => $data->task_id])->get();
+
+        }
+
+        $count=count($query);
+        return response()->json(['data' => $query, 'total' => $count]);
+
+    }
+
+
 }
